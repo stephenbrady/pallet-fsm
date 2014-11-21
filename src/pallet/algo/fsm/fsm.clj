@@ -21,8 +21,30 @@
   [state-map]
   (let [state-identity (state-identity state-map)]
     (fn [from-state to-state]
-      (let [v? (get-in state-map [(state-identity from-state) :transitions])]
-        (and v? (v? (state-identity to-state)))))))
+      (let [v? (get-in state-map [(state-identity from-state) :transitions])
+            valid-to-states (reduce #(conj %1 (nth %2 2)) #{} v?)]
+        (and valid-to-states (valid-to-states (state-identity to-state)))))))
+
+(defn- valid-command?-fn
+  [state-map]
+  (let [state-identity (state-identity state-map)]
+    (fn [from-state cmd]
+      (let [v? (get-in state-map [(state-identity from-state) :transitions])
+            valid-cmds (reduce #(conj %1 (nth %2 0)) #{} v?)]
+        (if (and valid-cmds (valid-cmds cmd))
+          true
+          (do (println "Invalid input for this state") false))))))
+
+(defn- do-command-fn
+  [state-map]
+  (let [state-identity (state-identity state-map)]
+    (fn [from-state cmd cmd-inputs state-data]
+      (let [bindings (get-in state-map [(state-identity from-state) :transitions])
+            [cmd-do-handler] (vec (for [binding_ bindings
+                                 :let [[binding-cmd cmd-do-handler _] binding_]
+                                 :when (= binding-cmd cmd)]
+                             cmd-do-handler))]
+        (cmd-do-handler state-data cmd-inputs)))))
 
 (defn- validate-state
   [state-map]
