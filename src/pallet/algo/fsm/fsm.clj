@@ -33,7 +33,7 @@
             valid-cmds (reduce #(conj %1 (nth %2 0)) #{} v?)]
         (if (and valid-cmds (valid-cmds cmd))
           true
-          (do (println "Invalid input for this state") false))))))
+          ((println "Invalid input for this state") false))))))
 
 (defn- do-command?-fn
   [state-map]
@@ -44,7 +44,7 @@
                                  :let [[binding-cmd cmd-do-handler _] binding_]
                                  :when (= binding-cmd cmd)]
                              cmd-do-handler))]
-        (cmd-do-handler cmd-inputs state-data)))))
+        (when (cmd-do-handler) (cmd-do-handler cmd-inputs state-data))))))
 
 (defn- validate-state
   [state-map]
