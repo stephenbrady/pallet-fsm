@@ -35,7 +35,7 @@
           true
           (do (println "Invalid input for this state") false))))))
 
-(defn- do-command-fn
+(defn- do-command?-fn
   [state-map]
   (let [state-identity (state-identity state-map)]
     (fn [from-state cmd cmd-inputs state-data]
@@ -44,7 +44,7 @@
                                  :let [[binding-cmd cmd-do-handler _] binding_]
                                  :when (= binding-cmd cmd)]
                              cmd-do-handler))]
-        (cmd-do-handler state-data cmd-inputs)))))
+        (cmd-do-handler cmd-inputs state-data)))))
 
 (defn- validate-state
   [state-map]
